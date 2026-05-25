@@ -1,5 +1,7 @@
 # 3-Tier-Network-
 # 3-Tier Network Terraform, python codes
+# All the codes have to be in one folder. please combine them 
+
 ☁️ 3-Tier Web Service Project on AWS
 
 This project is a record of my journey in designing and building a web service from the ground up on AWS. I focused on understanding how a web service operates securely and efficiently, covering everything from fundamental cloud infrastructure to Kubernetes deployment.
