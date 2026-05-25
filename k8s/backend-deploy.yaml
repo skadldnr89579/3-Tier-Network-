@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: status-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: status-backend
+  template:
+    metadata:
+      labels:
+        app: status-backend
+    spec:
+      containers:
+        - name: flask-backend
+          # [Important] Target ECR image repository path pushed by Steven
+          #image: [AWS account ID].dkr.ecr.ap-northeast-2.amazonaws.com/status-backend:latest
+          ports:
+            - containerPort: 5000
+          # [AWS Exam Topic] Injecting Database credentials via Container Environment Variables
+          env:
+            - name: DB_USER
+              value: "admin"
+            - name: DB_PASSWORD
+              #value: "[password set at rds.tf]" # Terraform Master Password
+            - name: DB_NAME
+              value: "status_db"
+            - name: DB_HOST
+              # [Action Required] Replace with the actual AWS RDS endpoint provisioned by Terraform
+              #value: "[rds endpoint address]"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: status-backend-service
+spec:
+  # Type ClusterIP keeps the backend isolated inside the cluster, ensuring secure internal communication only
+  type: ClusterIP
+  ports:
+    - port: 5000
+      targetPort: 5000
+  selector:
+    app: status-backend

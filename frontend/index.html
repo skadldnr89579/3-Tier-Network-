@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3-Tier Network - Steven Yi Wook Nam</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        text-align: center;
+        margin-top: 50px;
+        background-color: #f4f6f9;
+      }
+      h1 {
+        color: #333;
+      }
+      .btn-container {
+        margin: 30px 0;
+      }
+      .status-btn {
+        padding: 15px 30px;
+        margin: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .btn-work {
+        background-color: #2ecc71;
+      } /* Clock In */
+      .btn-leave {
+        background-color: #e74c3c;
+      } /* Clock Out */
+      .btn-progress {
+        background-color: #3498db;
+      } /* In Progress */
+      .btn-away {
+        background-color: #f39c12;
+      } /* Away */
+      .status-btn:hover {
+        opacity: 0.8;
+        transform: scale(1.05);
+      }
+      #log-area {
+        max-width: 500px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+        text-align: left;
+      }
+      li {
+        padding: 8px;
+        border-bottom: 1px solid #eee;
+        font-family: "Courier New", monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Steven's Attendance & Status Management System</h1>
+    <p>3-Tier Architecture Web Server is Running Successfully</p>
+
+    <div class="btn-container">
+      <button class="status-btn btn-work" onclick="logStatus('Clock In')">
+        Clock In
+      </button>
+      <button class="status-btn btn-leave" onclick="logStatus('Clock Out')">
+        Clock Out
+      </button>
+      <button
+        class="status-btn btn-progress"
+        onclick="logStatus('In Progress')"
+      >
+        In Progress
+      </button>
+      <button class="status-btn btn-away" onclick="logStatus('Away')">
+        Away
+      </button>
+    </div>
+
+    <div id="log-area">
+      <h3>Real-time Logs (Fetched from RDS via Flask API)</h3>
+      <ul id="log-list">
+        <li>[System] Service has started. Click the buttons above to test.</li>
+      </ul>
+    </div>
+
+    <script>
+      // Backend API endpoint configuration
+      const BACKEND_API =
+        "http://aad40d0efc31543bda427addc10587ab-583147425.ap-northeast-2.elb.amazonaws.com:5000";
+
+      /**
+       * Sends a status update request to the backend server
+       * @param {string} status - The status to be logged
+       */
+      function logStatus(status) {
+        fetch(`${BACKEND_API}/api/status`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: status }),
+        })
+          .then((res) => res.json())
+          .then(() => {
+            alert("Status change request detected.");
+            fetchLogs(); // Refresh the log list immediately after a successful update
+          })
+          .catch((err) => console.error("Error logging status:", err));
+      }
+
+      /**
+       * Fetches the current logs from the backend and updates the UI
+       */
+      function fetchLogs() {
+        fetch(`${BACKEND_API}/api/status`)
+          .then((res) => res.json())
+          .then((data) => {
+            const logList = document.getElementById("log-list");
+            logList.innerHTML = ""; // Clear existing logs
+
+            // Render logs in reverse chronological order
+            data.reverse().forEach((item) => {
+              const li = document.createElement("li");
+              // Assuming 'created_at' and 'status' fields exist in the DB response
+              li.innerHTML = `<strong>[${item.created_at || "N/A"}]</strong> ${item.status || "N/A"}`;
+              logList.appendChild(li);
+            });
+          })
+          .catch((err) => console.error("Error fetching logs:", err));
+      }
+
+      // Automatically fetch logs when the page finishes loading
+      window.onload = fetchLogs;
+    </script>
+  </body>
+</html>

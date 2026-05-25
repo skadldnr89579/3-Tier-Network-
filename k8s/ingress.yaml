@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: status-ingress
+  annotations:
+    # Specifies the ingress class to use the AWS Load Balancer Controller
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  rules:
+    - http:
+        paths:
+          # 1. Directs all /api requests to the backend (Flask) pod
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: status-backend-service
+                port:
+                  number: 5000
+          # 2. Directs all other requests (root path /) to the frontend pod
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: status-frontend-service
+                port:
+                  number: 80
