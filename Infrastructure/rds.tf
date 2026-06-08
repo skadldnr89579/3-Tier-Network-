@@ -46,6 +46,7 @@ resource "aws_db_instance" "status_db" {
   #password              = "[Type new password]" # password
   parameter_group_name  = "default.mysql8.0"
   skip_final_snapshot   = true
+  multi_az               = true
 
   db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.name
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
