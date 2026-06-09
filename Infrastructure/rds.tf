@@ -9,6 +9,7 @@ resource "aws_security_group" "rds_sg" {
     from_port       = 3306
     to_port         = 3306
     protocol        = "tcp"
+  # Restrict inbound traffic exclusively to the EKS worker nodes' security group
     security_groups = [aws_eks_cluster.status_eks.vpc_config[0].cluster_security_group_id]
   }
 
