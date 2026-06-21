@@ -46,4 +46,6 @@ Plaintext
 
 🔒 Security Note
 
-To maintain security, I have removed all actual database credentials and AWS account IDs. If you are running this project, please make sure to inject your own environment variables or secrets for a secure deployment.
+1) To maintain security, I have removed all actual database credentials and AWS account IDs. If you are running this project, please make sure to inject your own environment variables or secrets for a secure deployment.
+
+2) Removed/Disabled the Bastion Host to eliminate the security risk of an open SSH port (22) and to optimize cloud costs by cutting unnecessary resources.
